@@ -48,6 +48,31 @@
         .criteria-button.rotate {
             transform: rotate(180deg);
         }
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+        }
+        .modal-content-lg {
+            max-width: 800px;
+            text-align: left;
+        }
     </style>
 </head>
 <body>
@@ -58,205 +83,232 @@
 
     <script>
         // Objeto para simular la base de datos de usuarios
-        const usersDB = {
-            'admin': { role: 'admin' },
-            'Usuario01': {
-                role: 'user',
-                data: {
-                    name: 'José Pérez',
-                    viciCode: 'vici-j01',
-                    generalScore: 85,
-                    callGoal: 75,
-                    generalComments: 'Pedro, has demostrado un excelente desempeño este mes. Tu atención a los alumnos es destacable y sigues los procesos de manera consistente. Debes mejorar en los tiempos de respuesta para alcanzar los objetivos del equipo.',
-                    categories: [{
-                        id: 'retencion',
-                        name: 'Retención',
-                        emoji: '🤝',
-                        score: 9.0,
-                        comments: {
-                            supervision: 'Se cumplió la meta de retención.',
-                            quality: 'Excelentes habilidades de seguimiento.',
-                        },
-                        criteria: [
-                            { name: 'Seguimiento a población morosa.', score: 10 },
-                            { name: 'Total de bajas de alumnos con morosidad.', score: 8 },
-                            { name: 'Uso adecuado y oportuno de la columna de retención de CRM...', score: 9 },
-                            { name: 'Retención y bajas pagadas.', score: 9 },
-                        ],
-                        color: 'bg-indigo-200'
-                    }, {
-                        id: 'reincorporacion',
-                        name: 'Reincorporación',
-                        emoji: '🔄',
-                        score: 7.0,
-                        comments: {
-                            supervision: 'Se logró una buena tasa de reingreso.',
-                            quality: 'Área de oportunidad en la difusión de promociones.',
-                        },
-                        criteria: [
-                            { name: 'Bajas por no pago.', score: 7 },
-                            { name: 'Búsqueda y difusión de promociones.', score: 6 },
-                            { name: 'Registro y seguimiento.', score: 8 },
-                            { name: 'Cierre de prospectos.', score: 7 },
-                        ],
-                        color: 'bg-green-200'
-                    }, {
-                        id: 'procesos',
-                        name: 'Procesos',
-                        emoji: '⚙️',
-                        score: 9.5,
-                        comments: {
-                            supervision: 'Manejo impecable de los procesos académicos.',
-                            quality: 'Excelente organización y eficiencia.',
-                        },
-                        criteria: [
-                            { name: 'Procesos académicos: Cambio de carrera y/o programa...', score: 10 },
-                            { name: 'Documentación completa y correcta.', score: 9 },
-                            { name: 'Trámites en tiempo y forma.', score: 9.5 },
-                        ],
-                        color: 'bg-purple-200'
-                    }, {
-                        id: 'comunicacion',
-                        name: 'Comunicación',
-                        emoji: '💬',
-                        score: 8.5,
-                        comments: {
-                            supervision: 'Comunicación fluida con los alumnos y el equipo.',
-                            quality: 'Mensajes claros y sin errores.',
-                        },
-                        criteria: [
-                            { name: 'Redacción impecable y sin errores ortográficos.', score: 9 },
-                            { name: 'Uso de canales formales.', score: 8 },
-                            { name: 'Sinergia con otros departamentos.', score: 8.5 },
-                        ],
-                        color: 'bg-yellow-200'
-                    }, {
-                        id: 'administrativas',
-                        name: 'Actividades Administrativas',
-                        emoji: '📋',
-                        score: 8.0,
-                        comments: {
-                            supervision: 'Registro de actividades consistente.',
-                            quality: 'Mejorar la proactividad en guardias.',
-                        },
-                        criteria: [
-                            { name: 'Registra en tiempo (diario) sus actividades en el reporte...', score: 9 },
-                            { name: 'Asigna y actualiza perfiles.', score: 8 },
-                            { name: 'Canaliza de manera óptima las situaciones...', score: 7 },
-                        ],
-                        color: 'bg-pink-200'
-                    }, {
-                        id: 'general',
-                        name: 'General',
-                        emoji: '📊',
-                        score: 9.2,
-                        comments: {
-                            supervision: 'Desempeño general sobresaliente.',
-                            quality: 'Excelente actitud y compromiso.',
-                        },
-                        criteria: [
-                            { name: 'Productividad.', score: 9 },
-                            { name: 'Calidad de trabajo.', score: 9.5 },
-                            { name: 'Asertividad en la comunicación.', score: 9 },
-                        ],
-                        color: 'bg-gray-200'
-                    }, {
-                        id: 'whatsapp',
-                        name: 'WhatsApp',
-                        emoji: '📱',
-                        score: 10.0,
-                        comments: {
-                            supervision: 'Manejo ejemplar de los chats.',
-                            quality: 'Respuestas rápidas y asertivas.',
-                        },
-                        criteria: [
-                            { name: 'Tiempos de respuesta óptimos.', score: 10 },
-                            { name: 'Manejo de objeciones.', score: 10 },
-                            { name: 'Redacción impecable.', score: 10 },
-                        ],
-                        color: 'bg-lime-200'
-                    }],
-                    trends: {
-                        scores: {
-                            'retencion': [85, 87, 88, 89, 90, 91, 88, 89, 92, 90, 89, 91],
-                            'reincorporacion': [70, 75, 78, 80, 81, 85, 83, 82, 85, 86, 84, 87],
-                            'procesos': [90, 92, 93, 94, 95, 96, 94, 95, 96, 97, 95, 98],
-                            'general': [80, 82, 85, 86, 88, 89, 87, 89, 90, 88, 89, 90],
-                        },
-                        monthly: {
-                            'month-2': { score: 90, trend: 'up' },
-                            'month-1': { score: 91, trend: 'up' },
-                            'current': { score: 92, trend: 'up' }
-                        },
-                        improvement: 'Incremento del 5% en la tasa de reincorporación, superando la meta del equipo.',
-                        criticalArea: 'Mantener la agilidad en respuestas de WhatsApp durante picos de alta demanda.',
-                    },
-                    badges: [{
-                        title: '🏆 Maestro(a) de Procesos',
-                        description: 'Por su excelente manejo y seguimiento de los procesos académicos.'
-                    }, {
-                        title: '🚀 Asertividad Total',
-                        description: 'Por su asertividad y claridad en la comunicación con los alumnos.'
-                    }],
-                    upcomingBadges: {
-                        strengths: ['Excelencia en el seguimiento de procesos.', 'Capacidad de resolución de problemas.'],
-                        opportunities: ['Incrementar la proactividad en guardias.', 'Mejorar los tiempos de respuesta en horarios pico.']
-                    },
-                    improvementPlan: {
-                        instructions: 'Instrucciones para el Plan de Mejora. A partir de los resultados de tu evaluación, identifica de 3 a 4 áreas de oportunidad y describe acciones concretas que puedas implementar para mejorarlas. Indica el plazo estimado y cómo darás seguimiento a cada acción. Sé específico y realista para facilitar el cumplimiento y la evaluación de avances. Ingresa al siguiente enlace, redacta y establece tu plan de mejora antes del 11 de septiembre de 2025.',
-                        link: 'https://www.google.com'
-                    }
+        let usersDB = {};
+        const localStorageKey = 'cnci_evaluation_data';
+
+        // Cargar datos desde localStorage al inicio
+        function loadUsersFromLocalStorage() {
+            const storedData = localStorage.getItem(localStorageKey);
+            if (storedData) {
+                try {
+                    usersDB = JSON.parse(storedData);
+                } catch (e) {
+                    console.error("Error parsing data from localStorage", e);
+                    // Si hay un error, inicializar con los datos por defecto
+                    initializeDefaultUsers();
                 }
-            },
-            // Genera datos simulados para los usuarios 02-18
-            ...Array.from({ length: 17 }, (_, i) => {
-                const userNum = (i + 2).toString().padStart(2, '0');
-                const score = Math.floor(Math.random() * 20) + 70; // Puntaje entre 70 y 90
-                const categories = ['Retención', 'Reincorporación', 'Procesos', 'Comunicación', 'Actividades Administrativas', 'General', 'WhatsApp'];
-                return {
-                    [`Usuario${userNum}`]: {
-                        role: 'user',
-                        data: {
-                            name: `Usuario ${userNum}`,
-                            viciCode: `vici-${userNum}`,
-                            generalScore: score,
-                            callGoal: Math.floor(Math.random() * 30) + 60,
-                            generalComments: `Comentarios generales para el Usuario ${userNum}.`,
-                            categories: categories.map(cat => ({
-                                id: cat.toLowerCase().replace(/\s+/g, ''),
-                                name: cat,
-                                emoji: '📊',
-                                score: (Math.random() * 5) + 5, // Score entre 5 y 10
-                                comments: { supervision: `Comentario de Supervisión para ${cat}.`, quality: `Comentario de Calidad para ${cat}.` },
-                                criteria: [{ name: 'Criterio genérico 1', score: 8 }, { name: 'Criterio genérico 2', score: 9 }],
-                                color: 'bg-blue-200'
-                            })),
-                            trends: {
-                                scores: {
-                                    'retencion': Array.from({ length: 12 }, () => Math.floor(Math.random() * 20) + 70),
-                                    'reincorporacion': Array.from({ length: 12 }, () => Math.floor(Math.random() * 20) + 70),
-                                    'procesos': Array.from({ length: 12 }, () => Math.floor(Math.random() * 20) + 70),
-                                    'general': Array.from({ length: 12 }, () => Math.floor(Math.random() * 20) + 70),
-                                },
-                                monthly: {
-                                    'month-2': { score: Math.floor(Math.random() * 20) + 70, trend: 'up' },
-                                    'month-1': { score: Math.floor(Math.random() * 20) + 70, trend: 'down' },
-                                    'current': { score: Math.floor(Math.random() * 20) + 70, trend: 'up' }
-                                },
-                                improvement: 'Mejora genérica.',
-                                criticalArea: 'Área crítica genérica.',
+            } else {
+                initializeDefaultUsers();
+            }
+        }
+
+        // Guardar datos en localStorage
+        function saveUsersToLocalStorage() {
+            localStorage.setItem(localStorageKey, JSON.stringify(usersDB));
+        }
+        
+        // Inicializar usuarios por defecto
+        function initializeDefaultUsers() {
+            usersDB = {
+                'admin': { role: 'admin' },
+                'Usuario01': {
+                    role: 'user',
+                    data: {
+                        name: 'José Pérez',
+                        viciCode: 'vici-j01',
+                        generalScore: 85,
+                        callGoal: 75,
+                        generalComments: 'Pedro, has demostrado un excelente desempeño este mes. Tu atención a los alumnos es destacable y sigues los procesos de manera consistente. Debes mejorar en los tiempos de respuesta para alcanzar los objetivos del equipo.',
+                        categories: [{
+                            id: 'retencion',
+                            name: 'Retención',
+                            emoji: '🤝',
+                            score: 9.0,
+                            comments: {
+                                supervision: 'Se cumplió la meta de retención.',
+                                quality: 'Excelentes habilidades de seguimiento.',
                             },
-                            badges: [{ title: '🏅 Insignia Genérica', description: 'Descripción genérica.' }],
-                            upcomingBadges: { strengths: ['Fortaleza genérica.'], opportunities: ['Oportunidad genérica.'] },
-                            improvementPlan: {
-                                instructions: `Instrucciones para el Plan de Mejora para el Usuario ${userNum}.`,
-                                link: 'https://www.google.com'
+                            criteria: [
+                                { name: 'Seguimiento a población morosa.', score: 10 },
+                                { name: 'Total de bajas de alumnos con morosidad.', score: 8 },
+                                { name: 'Uso adecuado y oportuno de la columna de retención de CRM...', score: 9 },
+                                { name: 'Retención y bajas pagadas.', score: 9 },
+                            ],
+                            color: 'bg-indigo-200'
+                        }, {
+                            id: 'reincorporacion',
+                            name: 'Reincorporación',
+                            emoji: '🔄',
+                            score: 7.0,
+                            comments: {
+                                supervision: 'Se logró una buena tasa de reingreso.',
+                                quality: 'Área de oportunidad en la difusión de promociones.',
+                            },
+                            criteria: [
+                                { name: 'Bajas por no pago.', score: 7 },
+                                { name: 'Búsqueda y difusión de promociones.', score: 6 },
+                                { name: 'Registro y seguimiento.', score: 8 },
+                                { name: 'Cierre de prospectos.', score: 7 },
+                            ],
+                            color: 'bg-green-200'
+                        }, {
+                            id: 'procesos',
+                            name: 'Procesos',
+                            emoji: '⚙️',
+                            score: 9.5,
+                            comments: {
+                                supervision: 'Manejo impecable de los procesos académicos.',
+                                quality: 'Excelente organización y eficiencia.',
+                            },
+                            criteria: [
+                                { name: 'Procesos académicos: Cambio de carrera y/o programa...', score: 10 },
+                                { name: 'Documentación completa y correcta.', score: 9 },
+                                { name: 'Trámites en tiempo y forma.', score: 9.5 },
+                            ],
+                            color: 'bg-purple-200'
+                        }, {
+                            id: 'comunicacion',
+                            name: 'Comunicación',
+                            emoji: '💬',
+                            score: 8.5,
+                            comments: {
+                                supervision: 'Comunicación fluida con los alumnos y el equipo.',
+                                quality: 'Mensajes claros y sin errores.',
+                            },
+                            criteria: [
+                                { name: 'Redacción impecable y sin errores ortográficos.', score: 9 },
+                                { name: 'Uso de canales formales.', score: 8 },
+                                { name: 'Sinergia con otros departamentos.', score: 8.5 },
+                            ],
+                            color: 'bg-yellow-200'
+                        }, {
+                            id: 'administrativas',
+                            name: 'Actividades Administrativas',
+                            emoji: '📋',
+                            score: 8.0,
+                            comments: {
+                                supervision: 'Registro de actividades consistente.',
+                                quality: 'Mejorar la proactividad en guardias.',
+                            },
+                            criteria: [
+                                { name: 'Registra en tiempo (diario) sus actividades en el reporte...', score: 9 },
+                                { name: 'Asigna y actualiza perfiles.', score: 8 },
+                                { name: 'Canaliza de manera óptima las situaciones...', score: 7 },
+                            ],
+                            color: 'bg-pink-200'
+                        }, {
+                            id: 'general',
+                            name: 'General',
+                            emoji: '📊',
+                            score: 9.2,
+                            comments: {
+                                supervision: 'Desempeño general sobresaliente.',
+                                quality: 'Excelente actitud y compromiso.',
+                            },
+                            criteria: [
+                                { name: 'Productividad.', score: 9 },
+                                { name: 'Calidad de trabajo.', score: 9.5 },
+                                { name: 'Asertividad en la comunicación.', score: 9 },
+                            ],
+                            color: 'bg-gray-200'
+                        }, {
+                            id: 'whatsapp',
+                            name: 'WhatsApp',
+                            emoji: '📱',
+                            score: 10.0,
+                            comments: {
+                                supervision: 'Manejo ejemplar de los chats.',
+                                quality: 'Respuestas rápidas y asertivas.',
+                            },
+                            criteria: [
+                                { name: 'Tiempos de respuesta óptimos.', score: 10 },
+                                { name: 'Manejo de objeciones.', score: 10 },
+                                { name: 'Redacción impecable.', score: 10 },
+                            ],
+                            color: 'bg-lime-200'
+                        }],
+                        trends: {
+                            scores: {
+                                'retencion': [85, 87, 88, 89, 90, 91, 88, 89, 92, 90, 89, 91],
+                                'reincorporacion': [70, 75, 78, 80, 81, 85, 83, 82, 85, 86, 84, 87],
+                                'procesos': [90, 92, 93, 94, 95, 96, 94, 95, 96, 97, 95, 98],
+                                'general': [80, 82, 85, 86, 88, 89, 87, 89, 90, 88, 89, 90],
+                            },
+                            monthly: {
+                                'month-2': { score: 90, trend: 'up' },
+                                'month-1': { score: 91, trend: 'up' },
+                                'current': { score: 92, trend: 'up' }
+                            },
+                            improvement: 'Incremento del 5% en la tasa de reincorporación, superando la meta del equipo.',
+                            criticalArea: 'Mantener la agilidad en respuestas de WhatsApp durante picos de alta demanda.',
+                        },
+                        badges: [{
+                            title: '🏆 Maestro(a) de Procesos',
+                            description: 'Por su excelente manejo y seguimiento de los procesos académicos.'
+                        }, {
+                            title: '🚀 Asertividad Total',
+                            description: 'Por su asertividad y claridad en la comunicación con los alumnos.'
+                        }],
+                        upcomingBadges: {
+                            strengths: ['Excelencia en el seguimiento de procesos.', 'Capacidad de resolución de problemas.'],
+                            opportunities: ['Incrementar la proactividad en guardias.', 'Mejorar los tiempos de respuesta en horarios pico.']
+                        },
+                        improvementPlan: {
+                            instructions: 'Instrucciones para el Plan de Mejora. A partir de los resultados de tu evaluación, identifica de 3 a 4 áreas de oportunidad y describe acciones concretas que puedas implementar para mejorarlas. Indica el plazo estimado y cómo darás seguimiento a cada acción. Sé específico y realista para facilitar el cumplimiento y la evaluación de avances. Ingresa al siguiente enlace, redacta y establece tu plan de mejora antes del 11 de septiembre de 2025.',
+                            link: 'https://www.google.com'
+                        }
+                    }
+                },
+                ...Array.from({ length: 17 }, (_, i) => {
+                    const userNum = (i + 2).toString().padStart(2, '0');
+                    const score = Math.floor(Math.random() * 20) + 70;
+                    const categories = ['Retención', 'Reincorporación', 'Procesos', 'Comunicación', 'Actividades Administrativas', 'General', 'WhatsApp'];
+                    return {
+                        [`Usuario${userNum}`]: {
+                            role: 'user',
+                            data: {
+                                name: `Usuario ${userNum}`,
+                                viciCode: `vici-${userNum}`,
+                                generalScore: score,
+                                callGoal: Math.floor(Math.random() * 30) + 60,
+                                generalComments: `Comentarios generales para el Usuario ${userNum}.`,
+                                categories: categories.map(cat => ({
+                                    id: cat.toLowerCase().replace(/\s+/g, ''),
+                                    name: cat,
+                                    emoji: '📊',
+                                    score: (Math.random() * 5) + 5,
+                                    comments: { supervision: `Comentario de Supervisión para ${cat}.`, quality: `Comentario de Calidad para ${cat}.` },
+                                    criteria: [{ name: 'Criterio genérico 1', score: 8 }, { name: 'Criterio genérico 2', score: 9 }],
+                                    color: 'bg-blue-200'
+                                })),
+                                trends: {
+                                    scores: {
+                                        'retencion': Array.from({ length: 12 }, () => Math.floor(Math.random() * 20) + 70),
+                                        'reincorporacion': Array.from({ length: 12 }, () => Math.floor(Math.random() * 20) + 70),
+                                        'procesos': Array.from({ length: 12 }, () => Math.floor(Math.random() * 20) + 70),
+                                        'general': Array.from({ length: 12 }, () => Math.floor(Math.random() * 20) + 70),
+                                    },
+                                    monthly: {
+                                        'month-2': { score: Math.floor(Math.random() * 20) + 70, trend: 'up' },
+                                        'month-1': { score: Math.floor(Math.random() * 20) + 70, trend: 'down' },
+                                        'current': { score: Math.floor(Math.random() * 20) + 70, trend: 'up' }
+                                    },
+                                    improvement: 'Mejora genérica.',
+                                    criticalArea: 'Área crítica genérica.',
+                                },
+                                badges: [{ title: '🏅 Insignia Genérica', description: 'Descripción genérica.' }],
+                                upcomingBadges: { strengths: ['Fortaleza genérica.'], opportunities: ['Oportunidad genérica.'] },
+                                improvementPlan: {
+                                    instructions: `Instrucciones para el Plan de Mejora para el Usuario ${userNum}.`,
+                                    link: 'https://www.google.com'
+                                }
                             }
                         }
                     }
-                };
-            }).reduce((acc, obj) => ({ ...acc, ...obj }), {})
-        };
+                }).reduce((acc, obj) => ({ ...acc, ...obj }), {})
+            };
+            saveUsersToLocalStorage(); // Guardar los datos por defecto al inicializar
+        }
 
         let currentUser = null;
         let chartInstance = null;
@@ -311,18 +363,434 @@
         function renderAdminPanel() {
             appContainer.innerHTML = `
                 <div class="bg-white/90 p-8 rounded-3xl shadow-lg w-full">
-                    <div class="flex items-center justify-between mb-8">
-                        <h1 class="text-3xl font-bold text-gray-800">Panel de Administrador ⚙️</h1>
-                        <button id="backButton" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-xl shadow-md transition-all duration-300">
-                            ← Volver
-                        </button>
+                    <div class="flex flex-wrap items-center justify-between mb-8">
+                        <h1 class="text-3xl font-bold text-gray-800 mb-4 sm:mb-0">Panel de Administrador ⚙️</h1>
+                        <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
+                            <button id="backButton" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-xl shadow-md transition-all duration-300">
+                                ← Volver al login
+                            </button>
+                            <button id="addUserButton" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-xl shadow-md transition-all duration-300">
+                                Añadir Usuario
+                            </button>
+                            <button id="clearTableButton" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-xl shadow-md transition-all duration-300">
+                                Vaciar Tabla
+                            </button>
+                        </div>
                     </div>
-                    <div id="adminContent" class="space-y-4">
-                        <p class="text-center text-xl text-gray-600">Funcionalidad en desarrollo. Aquí se podría gestionar a los usuarios y sus datos.</p>
+                    <div id="adminContent" class="space-y-4 overflow-x-auto">
+                        <!-- Tabla de edición de usuarios -->
+                        <table class="min-w-full divide-y divide-gray-200 shadow-md rounded-lg">
+                            <thead class="bg-gray-50">
+                                <tr class="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th class="px-6 py-3 text-left">Usuario</th>
+                                    <th class="px-6 py-3 text-left">Nombre</th>
+                                    <th class="px-6 py-3 text-left">Puntaje General</th>
+                                    <th class="px-6 py-3 text-left">Meta de Llamadas</th>
+                                    <th class="px-6 py-3 text-left">Comentarios</th>
+                                    <th class="px-6 py-3 text-left">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="userTableBody" class="bg-white divide-y divide-gray-200 text-sm text-gray-700">
+                                <!-- Filas de usuarios se insertarán aquí -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Modal de confirmación para vaciar tabla -->
+                <div id="clearTableModal" class="modal-overlay hidden">
+                    <div class="modal-content">
+                        <h3 class="text-xl font-bold mb-4">Confirmar Acción</h3>
+                        <p class="mb-6">¿Estás seguro de que deseas eliminar TODOS los datos de la tabla? Esta acción es irreversible.</p>
+                        <div class="flex justify-center space-x-4">
+                            <button id="cancelClearButton" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-xl transition-all duration-300">
+                                Cancelar
+                            </button>
+                            <button id="confirmClearButton" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-xl transition-all duration-300">
+                                Eliminar Todo
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal para añadir/editar usuario (datos básicos) -->
+                <div id="userModal" class="modal-overlay hidden">
+                    <div class="modal-content max-w-2xl text-left">
+                        <h3 id="modalTitle" class="text-xl font-bold mb-4">Añadir Nuevo Usuario</h3>
+                        <form id="userForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-gray-700 font-semibold mb-1">Usuario Vici</label>
+                                <input type="text" id="viciUsername" required class="w-full p-2 border border-gray-300 rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-semibold mb-1">Nombre Completo</label>
+                                <input type="text" id="userName" required class="w-full p-2 border border-gray-300 rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-semibold mb-1">Puntaje General</label>
+                                <input type="number" id="generalScore" required min="0" max="100" class="w-full p-2 border border-gray-300 rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-semibold mb-1">Meta de Llamadas</label>
+                                <input type="number" id="callGoal" required min="0" max="100" class="w-full p-2 border border-gray-300 rounded-lg">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-gray-700 font-semibold mb-1">Comentarios Generales</label>
+                                <textarea id="generalComments" required rows="3" class="w-full p-2 border border-gray-300 rounded-lg"></textarea>
+                            </div>
+                            <!-- Aquí se podrían añadir más campos para editar todas las propiedades -->
+                            <div class="md:col-span-2 flex justify-end space-x-4 mt-4">
+                                <button type="button" id="cancelUserButton" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-xl">Cancelar</button>
+                                <button type="submit" id="saveUserButton" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-xl">Guardar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Nuevo: Modal de detalles y edición completa del usuario -->
+                <div id="detailsModal" class="modal-overlay hidden">
+                    <div class="modal-content modal-content-lg max-h-[90vh] overflow-y-auto">
+                        <h3 id="detailsModalTitle" class="text-2xl font-bold mb-6 text-center">Detalles del Usuario</h3>
+                        <form id="detailsForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Sección de Datos Generales -->
+                            <div class="md:col-span-2 p-4 bg-gray-100 rounded-xl">
+                                <h4 class="font-bold text-lg mb-2">Datos Generales</h4>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div><label class="block text-sm font-semibold mb-1">Nombre</label><input type="text" id="detailsName" class="w-full p-2 border rounded-lg"></div>
+                                    <div><label class="block text-sm font-semibold mb-1">Puntaje General</label><input type="number" id="detailsGeneralScore" class="w-full p-2 border rounded-lg"></div>
+                                    <div><label class="block text-sm font-semibold mb-1">Meta de Llamadas</label><input type="number" id="detailsCallGoal" class="w-full p-2 border rounded-lg"></div>
+                                    <div class="sm:col-span-2"><label class="block text-sm font-semibold mb-1">Comentarios Generales</label><textarea id="detailsGeneralComments" rows="3" class="w-full p-2 border rounded-lg"></textarea></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Sección de Categorías -->
+                            <div class="md:col-span-2 p-4 bg-gray-100 rounded-xl">
+                                <h4 class="font-bold text-lg mb-4">Categorías y Criterios</h4>
+                                <div id="detailsCategoriesContainer" class="space-y-4"></div>
+                            </div>
+
+                            <!-- Sección de Tendencias -->
+                            <div class="md:col-span-2 p-4 bg-gray-100 rounded-xl">
+                                <h4 class="font-bold text-lg mb-4">Tendencias</h4>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div><label class="block text-sm font-semibold mb-1">Mayor Mejora</label><textarea id="detailsImprovement" rows="2" class="w-full p-2 border rounded-lg"></textarea></div>
+                                    <div><label class="block text-sm font-semibold mb-1">Área Crítica</label><textarea id="detailsCriticalArea" rows="2" class="w-full p-2 border rounded-lg"></textarea></div>
+                                </div>
+                            </div>
+
+                            <!-- Sección de Insignias -->
+                            <div class="md:col-span-2 p-4 bg-gray-100 rounded-xl">
+                                <h4 class="font-bold text-lg mb-4">Insignias</h4>
+                                <div id="detailsBadgesContainer" class="space-y-4"></div>
+                            </div>
+
+                            <!-- Sección de Plan de Mejora -->
+                            <div class="md:col-span-2 p-4 bg-gray-100 rounded-xl">
+                                <h4 class="font-bold text-lg mb-2">Plan de Mejora</h4>
+                                <div><label class="block text-sm font-semibold mb-1">Instrucciones</label><textarea id="detailsImprovementInstructions" rows="3" class="w-full p-2 border rounded-lg"></textarea></div>
+                                <div><label class="block text-sm font-semibold mb-1">Enlace</label><input type="url" id="detailsImprovementLink" class="w-full p-2 border rounded-lg"></div>
+                            </div>
+
+                            <!-- Botones de acción -->
+                            <div class="md:col-span-2 flex justify-end space-x-4 mt-4">
+                                <button type="button" id="cancelDetailsButton" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-xl">Cancelar</button>
+                                <button type="submit" id="saveDetailsButton" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-xl">Guardar</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             `;
+            
+            // Adjuntar event listeners
             document.getElementById('backButton').addEventListener('click', renderLogin);
+            document.getElementById('clearTableButton').addEventListener('click', () => {
+                document.getElementById('clearTableModal').classList.remove('hidden');
+            });
+            document.getElementById('cancelClearButton').addEventListener('click', () => {
+                document.getElementById('clearTableModal').classList.add('hidden');
+            });
+            document.getElementById('confirmClearButton').addEventListener('click', clearAllUserData);
+            document.getElementById('addUserButton').addEventListener('click', () => {
+                showUserModal();
+            });
+            
+            // Añadir listeners para los botones del nuevo modal de detalles
+            document.getElementById('cancelDetailsButton').addEventListener('click', () => {
+                document.getElementById('detailsModal').classList.add('hidden');
+            });
+
+            renderUserTable();
+        }
+        
+        // Función para renderizar la tabla de usuarios en el panel de admin
+        function renderUserTable() {
+            const userTableBody = document.getElementById('userTableBody');
+            userTableBody.innerHTML = '';
+            
+            const userKeys = Object.keys(usersDB).filter(key => usersDB[key].role === 'user');
+            
+            userKeys.forEach(userKey => {
+                const userData = usersDB[userKey].data;
+                const row = document.createElement('tr');
+                row.className = "hover:bg-gray-100 transition-colors duration-200";
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap">${userKey}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">${userData.name}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">${userData.generalScore}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">${userData.callGoal}</td>
+                    <td class="px-6 py-4 max-w-xs truncate">${userData.generalComments}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button class="edit-btn text-indigo-600 hover:text-indigo-900 mr-2" data-user="${userKey}">Editar</button>
+                        <button class="details-btn text-blue-600 hover:text-blue-900 mr-2" data-user="${userKey}">Detalles</button>
+                        <button class="delete-btn text-red-600 hover:text-red-900" data-user="${userKey}">Eliminar</button>
+                    </td>
+                `;
+                userTableBody.appendChild(row);
+            });
+            
+            // Añadir listeners para los botones de editar, detalles y eliminar
+            document.querySelectorAll('.edit-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const userKey = e.target.getAttribute('data-user');
+                    showUserModal(userKey);
+                });
+            });
+            
+            document.querySelectorAll('.details-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const userKey = e.target.getAttribute('data-user');
+                    showDetailsModal(userKey);
+                });
+            });
+
+            document.querySelectorAll('.delete-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const userKey = e.target.getAttribute('data-user');
+                    if (confirm(`¿Estás seguro de que deseas eliminar al usuario ${userKey}?`)) {
+                        deleteUser(userKey);
+                    }
+                });
+            });
+        }
+        
+        // Función para mostrar el modal de usuario (añadir/editar datos básicos)
+        function showUserModal(userKey = null) {
+            const modal = document.getElementById('userModal');
+            const form = document.getElementById('userForm');
+            const title = document.getElementById('modalTitle');
+            const userInput = document.getElementById('viciUsername');
+            const nameInput = document.getElementById('userName');
+            const scoreInput = document.getElementById('generalScore');
+            const goalInput = document.getElementById('callGoal');
+            const commentsInput = document.getElementById('generalComments');
+
+            // Limpiar formulario y resetear estado
+            form.reset();
+            userInput.disabled = false;
+            
+            if (userKey) {
+                // Modo editar
+                title.textContent = `Editar Usuario: ${userKey}`;
+                const userData = usersDB[userKey].data;
+                userInput.value = userKey;
+                userInput.disabled = true; // No permitir cambiar la clave de usuario
+                nameInput.value = userData.name;
+                scoreInput.value = userData.generalScore;
+                goalInput.value = userData.callGoal;
+                commentsInput.value = userData.generalComments;
+            } else {
+                // Modo añadir
+                title.textContent = 'Añadir Nuevo Usuario';
+            }
+            
+            modal.classList.remove('hidden');
+            
+            // Manejar el envío del formulario
+            form.onsubmit = (e) => {
+                e.preventDefault();
+                const newUserKey = userInput.value.trim();
+                const newUserData = {
+                    name: nameInput.value,
+                    generalScore: parseInt(scoreInput.value),
+                    callGoal: parseInt(goalInput.value),
+                    generalComments: commentsInput.value,
+                    // Se pueden añadir más campos aquí
+                };
+                
+                // Si es un nuevo usuario, crear el objeto completo
+                if (!userKey) {
+                    newUserData.viciCode = `vici-${newUserKey.toLowerCase().replace('usuario', '')}`;
+                    // Clonar la estructura de datos del usuario de ejemplo
+                    const exampleData = JSON.parse(JSON.stringify(usersDB['Usuario01'].data));
+                    newUserData.categories = exampleData.categories;
+                    newUserData.trends = exampleData.trends;
+                    newUserData.badges = exampleData.badges;
+                    newUserData.upcomingBadges = exampleData.upcomingBadges;
+                    newUserData.improvementPlan = exampleData.improvementPlan;
+                    usersDB[newUserKey] = { role: 'user', data: newUserData };
+                } else {
+                    // Si es un usuario existente, solo actualizar los campos básicos
+                    usersDB[userKey].data.name = newUserData.name;
+                    usersDB[userKey].data.generalScore = newUserData.generalScore;
+                    usersDB[userKey].data.callGoal = newUserData.callGoal;
+                    usersDB[userKey].data.generalComments = newUserData.generalComments;
+                }
+                
+                saveUsersToLocalStorage();
+                renderUserTable();
+                modal.classList.add('hidden');
+            };
+            
+            // Manejar el botón de cancelar
+            document.getElementById('cancelUserButton').onclick = () => {
+                modal.classList.add('hidden');
+            };
+        }
+
+        // Nuevo: Función para mostrar el modal de detalles y edición completa
+        function showDetailsModal(userKey) {
+            const modal = document.getElementById('detailsModal');
+            const form = document.getElementById('detailsForm');
+            const userData = usersDB[userKey].data;
+            
+            // Rellenar el formulario con los datos actuales
+            document.getElementById('detailsModalTitle').textContent = `Detalles de ${userData.name}`;
+            document.getElementById('detailsName').value = userData.name;
+            document.getElementById('detailsGeneralScore').value = userData.generalScore;
+            document.getElementById('detailsCallGoal').value = userData.callGoal;
+            document.getElementById('detailsGeneralComments').value = userData.generalComments;
+
+            // Rellenar categorías
+            const categoriesContainer = document.getElementById('detailsCategoriesContainer');
+            categoriesContainer.innerHTML = '';
+            userData.categories.forEach(cat => {
+                const catDiv = document.createElement('div');
+                catDiv.className = 'p-4 border rounded-lg';
+                catDiv.innerHTML = `
+                    <h5 class="font-semibold mb-2">${cat.name}</h5>
+                    <div><label class="block text-sm font-semibold mb-1">Puntaje</label><input type="number" step="0.1" value="${cat.score}" data-category-id="${cat.id}" data-field="score" class="w-full p-2 border rounded-lg"></div>
+                    <div><label class="block text-sm font-semibold mt-2 mb-1">Comentarios de Supervisión</label><textarea data-category-id="${cat.id}" data-field="comments.supervision" rows="2" class="w-full p-2 border rounded-lg">${cat.comments.supervision}</textarea></div>
+                    <div><label class="block text-sm font-semibold mt-2 mb-1">Comentarios de Calidad</label><textarea data-category-id="${cat.id}" data-field="comments.quality" rows="2" class="w-full p-2 border rounded-lg">${cat.comments.quality}</textarea></div>
+                    <h6 class="font-bold text-sm mt-4 mb-2">Criterios</h6>
+                    <div class="space-y-2">
+                        ${cat.criteria.map((crit, index) => `
+                            <div>
+                                <label class="block text-xs font-semibold mb-1">${crit.name}</label>
+                                <input type="number" step="0.1" value="${crit.score}" data-category-id="${cat.id}" data-criteria-index="${index}" class="w-full p-2 border rounded-lg">
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                categoriesContainer.appendChild(catDiv);
+            });
+
+            // Rellenar tendencias
+            document.getElementById('detailsImprovement').value = userData.trends.improvement;
+            document.getElementById('detailsCriticalArea').value = userData.trends.criticalArea;
+            // Podrías rellenar los puntajes mensuales aquí también si fuera necesario
+
+            // Rellenar insignias
+            const badgesContainer = document.getElementById('detailsBadgesContainer');
+            badgesContainer.innerHTML = `
+                <h6 class="font-bold text-sm mb-2">Obtenidas</h6>
+                ${userData.badges.map((badge, index) => `
+                    <div class="flex items-center space-x-2">
+                        <input type="text" value="${badge.title}" data-badge-index="${index}" data-field="title" class="w-1/2 p-2 border rounded-lg">
+                        <input type="text" value="${badge.description}" data-badge-index="${index}" data-field="description" class="w-1/2 p-2 border rounded-lg">
+                    </div>
+                `).join('')}
+                <h6 class="font-bold text-sm mt-4 mb-2">Próximas Insignias</h6>
+                <label class="block text-sm font-semibold mb-1">Fortalezas</label>
+                <textarea id="detailsStrengths" rows="2" class="w-full p-2 border rounded-lg">${userData.upcomingBadges.strengths.join('\n')}</textarea>
+                <label class="block text-sm font-semibold mt-2 mb-1">Oportunidades</label>
+                <textarea id="detailsOpportunities" rows="2" class="w-full p-2 border rounded-lg">${userData.upcomingBadges.opportunities.join('\n')}</textarea>
+            `;
+
+            // Rellenar plan de mejora
+            document.getElementById('detailsImprovementInstructions').value = userData.improvementPlan.instructions;
+            document.getElementById('detailsImprovementLink').value = userData.improvementPlan.link;
+
+            // Mostrar el modal
+            modal.classList.remove('hidden');
+            
+            // Manejar el envío del formulario de detalles
+            form.onsubmit = (e) => {
+                e.preventDefault();
+                
+                // Actualizar los datos generales
+                userData.name = document.getElementById('detailsName').value;
+                userData.generalScore = parseInt(document.getElementById('detailsGeneralScore').value);
+                userData.callGoal = parseInt(document.getElementById('detailsCallGoal').value);
+                userData.generalComments = document.getElementById('detailsGeneralComments').value;
+
+                // Actualizar categorías y criterios
+                userData.categories.forEach(cat => {
+                    cat.score = parseFloat(document.querySelector(`[data-category-id="${cat.id}"][data-field="score"]`).value);
+                    cat.comments.supervision = document.querySelector(`[data-category-id="${cat.id}"][data-field="comments.supervision"]`).value;
+                    cat.comments.quality = document.querySelector(`[data-category-id="${cat.id}"][data-field="comments.quality"]`).value;
+                    cat.criteria.forEach((crit, index) => {
+                        const input = document.querySelector(`[data-category-id="${cat.id}"][data-criteria-index="${index}"]`);
+                        crit.score = parseFloat(input.value);
+                    });
+                });
+
+                // Actualizar tendencias
+                userData.trends.improvement = document.getElementById('detailsImprovement').value;
+                userData.trends.criticalArea = document.getElementById('detailsCriticalArea').value;
+                
+                // Actualizar insignias
+                document.querySelectorAll('#detailsBadgesContainer input').forEach(input => {
+                    const index = parseInt(input.getAttribute('data-badge-index'));
+                    const field = input.getAttribute('data-field');
+                    userData.badges[index][field] = input.value;
+                });
+                userData.upcomingBadges.strengths = document.getElementById('detailsStrengths').value.split('\n').map(s => s.trim()).filter(s => s);
+                userData.upcomingBadges.opportunities = document.getElementById('detailsOpportunities').value.split('\n').map(o => o.trim()).filter(o => o);
+
+                // Actualizar plan de mejora
+                userData.improvementPlan.instructions = document.getElementById('detailsImprovementInstructions').value;
+                userData.improvementPlan.link = document.getElementById('detailsImprovementLink').value;
+
+                // Guardar los cambios en la base de datos y la persistencia
+                saveUsersToLocalStorage();
+                renderUserTable(); // Actualizar la tabla en el panel de admin
+                modal.classList.add('hidden');
+            };
+        }
+        
+        // Función para eliminar un usuario
+        function deleteUser(userKey) {
+            delete usersDB[userKey];
+            saveUsersToLocalStorage();
+            renderUserTable();
+        }
+
+        // Función para vaciar todos los datos de los usuarios (excepto admin)
+        function clearAllUserData() {
+            const adminData = usersDB['admin'];
+            usersDB = { 'admin': adminData };
+            saveUsersToLocalStorage();
+            renderUserTable();
+            document.getElementById('clearTableModal').classList.add('hidden');
+            alertMessage('✅ Tabla vaciada exitosamente.', 'green');
+        }
+        
+        // Función para mostrar mensajes de alerta personalizados
+        function alertMessage(message, color) {
+            const alertBox = document.createElement('div');
+            alertBox.textContent = message;
+            alertBox.className = `fixed top-4 right-4 p-4 rounded-lg text-white shadow-lg transition-all duration-300 transform translate-x-full z-20 ${color === 'green' ? 'bg-green-500' : 'bg-red-500'}`;
+            document.body.appendChild(alertBox);
+
+            setTimeout(() => {
+                alertBox.classList.remove('translate-x-full');
+                alertBox.style.transform = 'translateX(0)';
+            }, 10);
+
+            setTimeout(() => {
+                alertBox.style.transform = 'translateX(100%)';
+                setTimeout(() => alertBox.remove(), 500);
+            }, 3000);
         }
 
         // Función para renderizar el dashboard principal
@@ -744,8 +1212,11 @@
             }
         }
 
-        // Renderiza la pantalla inicial al cargar la página
-        document.addEventListener('DOMContentLoaded', renderLogin);
+        // Cargar datos y renderizar la pantalla inicial al cargar la página
+        document.addEventListener('DOMContentLoaded', () => {
+            loadUsersFromLocalStorage();
+            renderLogin();
+        });
     </script>
 
 </body>
