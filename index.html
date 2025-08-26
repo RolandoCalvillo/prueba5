@@ -85,6 +85,9 @@
         // Objeto para simular la base de datos de usuarios
         let usersDB = {};
         const localStorageKey = 'cnci_evaluation_data';
+        
+        // Nombres de los meses para las etiquetas de los gráficos y edición
+        const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
 
         // Cargar datos desde localStorage al inicio
         function loadUsersFromLocalStorage() {
@@ -471,10 +474,13 @@
 
                             <!-- Sección de Tendencias -->
                             <div class="md:col-span-2 p-4 bg-gray-100 rounded-xl">
-                                <h4 class="font-bold text-lg mb-4">Tendencias</h4>
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <div><label class="block text-sm font-semibold mb-1">Mayor Mejora</label><textarea id="detailsImprovement" rows="2" class="w-full p-2 border rounded-lg"></textarea></div>
-                                    <div><label class="block text-sm font-semibold mb-1">Área Crítica</label><textarea id="detailsCriticalArea" rows="2" class="w-full p-2 border rounded-lg"></textarea></div>
+                                <h4 class="font-bold text-lg mb-4">Tendencias (Valores de Gráfica)</h4>
+                                <div class="grid grid-cols-1 gap-4" id="detailsTrendsContainer">
+                                    <!-- Aquí se generarán los campos de edición para los valores de la gráfica -->
+                                </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                                    <div><label class="block text-sm font-semibold mb-1">Mayor Mejora</label><input type="text" id="detailsImprovement" class="w-full p-2 border rounded-lg"></div>
+                                    <div><label class="block text-sm font-semibold mb-1">Área Crítica</label><input type="text" id="detailsCriticalArea" class="w-full p-2 border rounded-lg"></div>
                                 </div>
                             </div>
 
@@ -687,7 +693,32 @@
             // Rellenar tendencias
             document.getElementById('detailsImprovement').value = userData.trends.improvement;
             document.getElementById('detailsCriticalArea').value = userData.trends.criticalArea;
-            // Podrías rellenar los puntajes mensuales aquí también si fuera necesario
+            
+            const trendsContainer = document.getElementById('detailsTrendsContainer');
+            trendsContainer.innerHTML = '';
+
+            // Generar campos de edición para los valores de la gráfica de líneas
+            Object.keys(userData.trends.scores).forEach(categoryKey => {
+                const categoryName = userData.categories.find(c => c.id === categoryKey)?.name || categoryKey;
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'p-4 border rounded-lg';
+                categoryDiv.innerHTML = `<h5 class="font-bold mb-4">${categoryName}</h5>`;
+                
+                const gridDiv = document.createElement('div');
+                gridDiv.className = 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2';
+
+                userData.trends.scores[categoryKey].forEach((score, index) => {
+                    const month = monthNames[index];
+                    const inputDiv = document.createElement('div');
+                    inputDiv.innerHTML = `
+                        <label class="block text-sm font-semibold mb-1">${month}</label>
+                        <input type="number" step="1" value="${score}" data-category-id="${categoryKey}" data-month-index="${index}" class="w-full p-2 border rounded-lg text-sm">
+                    `;
+                    gridDiv.appendChild(inputDiv);
+                });
+                categoryDiv.appendChild(gridDiv);
+                trendsContainer.appendChild(categoryDiv);
+            });
 
             // Rellenar insignias
             const badgesContainer = document.getElementById('detailsBadgesContainer');
@@ -738,11 +769,20 @@
                 userData.trends.improvement = document.getElementById('detailsImprovement').value;
                 userData.trends.criticalArea = document.getElementById('detailsCriticalArea').value;
                 
+                // Actualizar los puntajes de la gráfica
+                document.querySelectorAll('#detailsTrendsContainer input').forEach(input => {
+                    const categoryId = input.getAttribute('data-category-id');
+                    const monthIndex = parseInt(input.getAttribute('data-month-index'));
+                    userData.trends.scores[categoryId][monthIndex] = parseFloat(input.value);
+                });
+                
                 // Actualizar insignias
                 document.querySelectorAll('#detailsBadgesContainer input').forEach(input => {
                     const index = parseInt(input.getAttribute('data-badge-index'));
                     const field = input.getAttribute('data-field');
-                    userData.badges[index][field] = input.value;
+                    if(field && !isNaN(index)) { // Asegurar que es un campo de insignia
+                        userData.badges[index][field] = input.value;
+                    }
                 });
                 userData.upcomingBadges.strengths = document.getElementById('detailsStrengths').value.split('\n').map(s => s.trim()).filter(s => s);
                 userData.upcomingBadges.opportunities = document.getElementById('detailsOpportunities').value.split('\n').map(o => o.trim()).filter(o => o);
