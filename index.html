@@ -734,7 +734,7 @@
                 catDiv.className = 'p-4 border rounded-lg';
                 catDiv.innerHTML = `
                     <h5 class="font-semibold mb-2">${cat.name}</h5>
-                    <div><label class="block text-sm font-semibold mb-1">Puntaje</label><input type="number" step="0.1" value="${cat.score}" data-category-id="${cat.id}" data-field="score" class="w-full p-2 border rounded-lg"></div>
+                    <div><label class="block text-sm font-semibold mb-1">Puntaje</label><input type="number" value="${cat.score}" data-category-id="${cat.id}" data-field="score" class="w-full p-2 border rounded-lg"></div>
                     <div><label class="block text-sm font-semibold mt-2 mb-1">Comentarios de Supervisión</label><textarea data-category-id="${cat.id}" data-field="comments.supervision" rows="2" class="w-full p-2 border rounded-lg">${cat.comments.supervision}</textarea></div>
                     <div><label class="block text-sm font-semibold mt-2 mb-1">Comentarios de Calidad</label><textarea data-category-id="${cat.id}" data-field="comments.quality" rows="2" class="w-full p-2 border rounded-lg">${cat.comments.quality}</textarea></div>
                     <h6 class="font-bold text-sm mt-4 mb-2">Criterios</h6>
