@@ -223,7 +223,7 @@
                             callGoal: Math.floor(Math.random() * 30) + 60,
                             generalComments: `Comentarios generales para el Usuario ${userNum}.`,
                             categories: categories.map(cat => ({
-                                id: cat.toLowerCase(),
+                                id: cat.toLowerCase().replace(/\s+/g, ''),
                                 name: cat,
                                 emoji: '📊',
                                 score: (Math.random() * 5) + 5, // Score entre 5 y 10
@@ -233,7 +233,10 @@
                             })),
                             trends: {
                                 scores: {
-                                    'general': Array.from({ length: 12 }, () => Math.floor(Math.random() * 20) + 70)
+                                    'retencion': Array.from({ length: 12 }, () => Math.floor(Math.random() * 20) + 70),
+                                    'reincorporacion': Array.from({ length: 12 }, () => Math.floor(Math.random() * 20) + 70),
+                                    'procesos': Array.from({ length: 12 }, () => Math.floor(Math.random() * 20) + 70),
+                                    'general': Array.from({ length: 12 }, () => Math.floor(Math.random() * 20) + 70),
                                 },
                                 monthly: {
                                     'month-2': { score: Math.floor(Math.random() * 20) + 70, trend: 'up' },
@@ -681,10 +684,26 @@
                         updateChartDatasets();
                     });
                 }
-            }
+                
+                // Lógica de los criterios de evaluación expandibles
+                const criteriaToggles = document.querySelectorAll('.criteria-toggle');
+                criteriaToggles.forEach(toggle => {
+                    toggle.addEventListener('click', () => {
+                        const targetId = toggle.getAttribute('data-target');
+                        const targetList = document.querySelector(targetId);
+                        const arrowIcon = toggle.querySelector('.criteria-button');
+                        
+                        if (targetList.classList.contains('hidden')) {
+                            targetList.classList.remove('hidden');
+                            arrowIcon.classList.add('rotate');
+                        } else {
+                            targetList.classList.add('hidden');
+                            arrowIcon.classList.remove('rotate');
+                        }
+                    });
+                });
 
-            // Lógica para las tarjetas de la pestaña "Resumen General"
-            setTimeout(() => {
+                // Lógica para las tarjetas de la pestaña "Resumen General"
                 const categoryTabs = document.querySelectorAll('.tab-button-internal');
                 categoryTabs.forEach(tab => {
                     tab.addEventListener('click', (e) => {
@@ -722,25 +741,7 @@
                         }
                     });
                 });
-
-                // Lógica de los criterios de evaluación expandibles
-                const criteriaToggles = document.querySelectorAll('.criteria-toggle');
-                criteriaToggles.forEach(toggle => {
-                    toggle.addEventListener('click', () => {
-                        const targetId = toggle.getAttribute('data-target');
-                        const targetList = document.querySelector(targetId);
-                        const arrowIcon = toggle.querySelector('.criteria-button');
-                        
-                        if (targetList.classList.contains('hidden')) {
-                            targetList.classList.remove('hidden');
-                            arrowIcon.classList.add('rotate');
-                        } else {
-                            targetList.classList.add('hidden');
-                            arrowIcon.classList.remove('rotate');
-                        }
-                    });
-                });
-            }, 100);
+            }
         }
 
         // Renderiza la pantalla inicial al cargar la página
