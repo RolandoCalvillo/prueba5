@@ -381,22 +381,35 @@
                         </div>
                     </div>
                     <div id="adminContent" class="space-y-4 overflow-x-auto">
-                        <!-- Tabla de edición de usuarios -->
-                        <table class="min-w-full divide-y divide-gray-200 shadow-md rounded-lg">
-                            <thead class="bg-gray-50">
-                                <tr class="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    <th class="px-6 py-3 text-left">Usuario</th>
-                                    <th class="px-6 py-3 text-left">Nombre</th>
-                                    <th class="px-6 py-3 text-left">Puntaje General</th>
-                                    <th class="px-6 py-3 text-left">Meta de Llamadas</th>
-                                    <th class="px-6 py-3 text-left">Comentarios</th>
-                                    <th class="px-6 py-3 text-left">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody id="userTableBody" class="bg-white divide-y divide-gray-200 text-sm text-gray-700">
-                                <!-- Filas de usuarios se insertarán aquí -->
-                            </tbody>
-                        </table>
+                        <!-- Sección de Edición de Usuarios -->
+                        <div class="p-6 bg-gray-100 rounded-2xl shadow-md">
+                            <h2 class="text-xl font-bold mb-4 text-gray-800">Edición de Usuarios</h2>
+                            <table class="min-w-full divide-y divide-gray-200 shadow-md rounded-lg">
+                                <thead class="bg-gray-50">
+                                    <tr class="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th class="px-6 py-3 text-left">Usuario</th>
+                                        <th class="px-6 py-3 text-left">Nombre</th>
+                                        <th class="px-6 py-3 text-left">Puntaje General</th>
+                                        <th class="px-6 py-3 text-left">Meta de Llamadas</th>
+                                        <th class="px-6 py-3 text-left">Comentarios</th>
+                                        <th class="px-6 py-3 text-left">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="userTableBody" class="bg-white divide-y divide-gray-200 text-sm text-gray-700">
+                                    <!-- Filas de usuarios se insertarán aquí -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Nueva Sección: Edición de Categorías y Criterios -->
+                        <div class="p-6 bg-gray-100 rounded-2xl shadow-md">
+                            <h2 class="text-xl font-bold mb-4 text-gray-800">Edición de Categorías y Criterios de Evaluación</h2>
+                            <p class="text-sm text-gray-600 mb-4">Los cambios realizados aquí se aplicarán a la plantilla de todos los usuarios.
+                            </p>
+                            <button id="editCategoriesButton" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-xl shadow-md transition-all duration-300">
+                                Editar Categorías y Criterios
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -505,6 +518,50 @@
                         </form>
                     </div>
                 </div>
+
+                <!-- Nuevo Modal: Gestión de Categorías y Criterios -->
+                <div id="categoryManagementModal" class="modal-overlay hidden">
+                    <div class="modal-content modal-content-lg max-h-[90vh] overflow-y-auto">
+                        <h3 class="text-2xl font-bold mb-6 text-center">Gestión de Categorías y Criterios</h3>
+                        <div class="flex justify-end mb-4">
+                            <button id="addCategoryButton" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-xl">Añadir Categoría</button>
+                        </div>
+                        <div id="categoriesList" class="space-y-4">
+                            <!-- Las categorías se renderizarán aquí -->
+                        </div>
+                        <div class="flex justify-end space-x-4 mt-6">
+                            <button id="closeCategoryModalButton" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-xl">Cerrar</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Nuevo Modal: Edición de una Categoría específica -->
+                <div id="editCategoryModal" class="modal-overlay hidden">
+                    <div class="modal-content modal-content-lg max-h-[90vh] overflow-y-auto">
+                        <h3 id="editCategoryTitle" class="text-2xl font-bold mb-6 text-center"></h3>
+                        <form id="editCategoryForm" class="space-y-4">
+                            <div>
+                                <label class="block text-gray-700 font-semibold mb-1">Nombre de la Categoría</label>
+                                <input type="text" id="categoryNameInput" class="w-full p-2 border rounded-lg" required>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-semibold mb-1">Emoji</label>
+                                <input type="text" id="categoryEmojiInput" class="w-full p-2 border rounded-lg" maxlength="2">
+                            </div>
+                            <div class="mt-6 p-4 bg-gray-100 rounded-xl">
+                                <h4 class="font-bold text-lg mb-2">Criterios de Evaluación</h4>
+                                <div id="criteriaContainer" class="space-y-2">
+                                    <!-- Los criterios se renderizarán aquí -->
+                                </div>
+                                <button type="button" id="addCriterionButton" class="mt-4 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-xl text-sm">Añadir Criterio</button>
+                            </div>
+                            <div class="flex justify-end space-x-4 mt-6">
+                                <button type="button" id="cancelEditCategoryButton" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-xl">Cancelar</button>
+                                <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-xl">Guardar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             `;
             
             // Adjuntar event listeners
@@ -518,6 +575,9 @@
             document.getElementById('confirmClearButton').addEventListener('click', clearAllUserData);
             document.getElementById('addUserButton').addEventListener('click', () => {
                 showUserModal();
+            });
+            document.getElementById('editCategoriesButton').addEventListener('click', () => {
+                showCategoryManagementModal();
             });
             
             // Añadir listeners para los botones del nuevo modal de detalles
@@ -832,6 +892,223 @@
                 setTimeout(() => alertBox.remove(), 500);
             }, 3000);
         }
+
+        // --- Nuevas funciones para la gestión de categorías ---
+
+        // Función para mostrar el modal de gestión de categorías
+        function showCategoryManagementModal() {
+            const modal = document.getElementById('categoryManagementModal');
+            const categoriesList = document.getElementById('categoriesList');
+            categoriesList.innerHTML = '';
+            
+            // Usamos las categorías del primer usuario para la plantilla
+            const categories = usersDB['Usuario01'].data.categories;
+
+            categories.forEach(cat => {
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'flex items-center justify-between p-4 bg-white rounded-lg shadow-sm';
+                categoryDiv.innerHTML = `
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xl">${cat.emoji}</span>
+                        <span class="font-semibold text-gray-800">${cat.name}</span>
+                    </div>
+                    <div class="space-x-2">
+                        <button class="edit-category-btn bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-1 px-3 rounded-lg text-sm transition-colors duration-200" data-id="${cat.id}">Editar</button>
+                        <button class="delete-category-btn bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-3 rounded-lg text-sm transition-colors duration-200" data-id="${cat.id}">Eliminar</button>
+                    </div>
+                `;
+                categoriesList.appendChild(categoryDiv);
+            });
+
+            // Añadir listeners para los botones del modal de gestión
+            document.querySelectorAll('.edit-category-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const categoryId = e.target.getAttribute('data-id');
+                    showEditCategoryModal(categoryId);
+                });
+            });
+
+            document.querySelectorAll('.delete-category-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const categoryId = e.target.getAttribute('data-id');
+                    if (confirm(`¿Estás seguro de que deseas eliminar la categoría y sus criterios?`)) {
+                        deleteCategory(categoryId);
+                    }
+                });
+            });
+
+            document.getElementById('addCategoryButton').addEventListener('click', () => {
+                showEditCategoryModal();
+            });
+
+            document.getElementById('closeCategoryModalButton').addEventListener('click', () => {
+                modal.classList.add('hidden');
+            });
+
+            modal.classList.remove('hidden');
+        }
+
+        // Función para mostrar el modal de edición de una categoría
+        function showEditCategoryModal(categoryId = null) {
+            const categoryManagementModal = document.getElementById('categoryManagementModal');
+            const editCategoryModal = document.getElementById('editCategoryModal');
+            const editCategoryForm = document.getElementById('editCategoryForm');
+            const title = document.getElementById('editCategoryTitle');
+            const nameInput = document.getElementById('categoryNameInput');
+            const emojiInput = document.getElementById('categoryEmojiInput');
+            const criteriaContainer = document.getElementById('criteriaContainer');
+
+            // Limpiar formulario
+            editCategoryForm.reset();
+            criteriaContainer.innerHTML = '';
+
+            let categoryData = null;
+            if (categoryId) {
+                title.textContent = 'Editar Categoría';
+                categoryData = usersDB['Usuario01'].data.categories.find(cat => cat.id === categoryId);
+                nameInput.value = categoryData.name;
+                emojiInput.value = categoryData.emoji;
+                
+                // Rellenar criterios
+                if (categoryData.criteria) {
+                    categoryData.criteria.forEach((crit, index) => {
+                        addCriterionRow(crit.name, index);
+                    });
+                }
+            } else {
+                title.textContent = 'Añadir Nueva Categoría';
+                // Añadir un criterio por defecto para una nueva categoría
+                addCriterionRow('', 0);
+            }
+
+            // Ocultar modal de gestión y mostrar modal de edición
+            categoryManagementModal.classList.add('hidden');
+            editCategoryModal.classList.remove('hidden');
+
+            document.getElementById('addCriterionButton').onclick = () => addCriterionRow();
+
+            editCategoryForm.onsubmit = (e) => {
+                e.preventDefault();
+                const newCategoryName = nameInput.value;
+                const newCategoryEmoji = emojiInput.value;
+                
+                // Recolectar criterios del formulario
+                const newCriteria = [];
+                document.querySelectorAll('.criterion-row').forEach(row => {
+                    const name = row.querySelector('input').value;
+                    if (name) {
+                         newCriteria.push({ name: name, score: 10 }); // El puntaje por defecto para un nuevo criterio será 10
+                    }
+                });
+
+                // Si es una categoría nueva
+                if (!categoryId) {
+                    const newId = newCategoryName.toLowerCase().replace(/\s+/g, '');
+                    const newCategory = {
+                        id: newId,
+                        name: newCategoryName,
+                        emoji: newCategoryEmoji,
+                        score: 0,
+                        comments: { supervision: '', quality: '' },
+                        criteria: newCriteria,
+                        color: 'bg-blue-200' // Color por defecto
+                    };
+                    addCategory(newCategory);
+                } else {
+                    // Si es una categoría existente
+                    const updatedCategory = { ...categoryData, name: newCategoryName, emoji: newCategoryEmoji, criteria: newCriteria };
+                    updateCategory(updatedCategory);
+                }
+
+                // Ocultar modal de edición y mostrar modal de gestión actualizado
+                editCategoryModal.classList.add('hidden');
+                showCategoryManagementModal();
+            };
+
+            document.getElementById('cancelEditCategoryButton').onclick = () => {
+                editCategoryModal.classList.add('hidden');
+                showCategoryManagementModal();
+            };
+        }
+
+        // Función auxiliar para añadir una fila de criterio al modal
+        function addCriterionRow(name = '', index = Date.now()) {
+            const criteriaContainer = document.getElementById('criteriaContainer');
+            const rowDiv = document.createElement('div');
+            rowDiv.className = 'criterion-row flex items-center space-x-2';
+            rowDiv.innerHTML = `
+                <input type="text" placeholder="Nombre del criterio" value="${name}" class="w-full p-2 border rounded-lg" required>
+                <button type="button" class="delete-criterion-btn bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-3 rounded-lg text-sm">X</button>
+            `;
+            criteriaContainer.appendChild(rowDiv);
+
+            rowDiv.querySelector('.delete-criterion-btn').onclick = () => {
+                if (confirm('¿Estás seguro de que deseas eliminar este criterio?')) {
+                    rowDiv.remove();
+                }
+            };
+        }
+
+        // Lógica para añadir una nueva categoría a todos los usuarios
+        function addCategory(newCategory) {
+            const trendCategories = Object.keys(usersDB['Usuario01'].data.trends.scores);
+            // Si es una de las categorías principales, agregar un array vacío de tendencias
+            if (['retencion', 'reincorporacion', 'procesos', 'general'].includes(newCategory.id)) {
+                newCategory.trends = Array(12).fill(0);
+            }
+        
+            Object.keys(usersDB).forEach(userKey => {
+                if (usersDB[userKey].role === 'user') {
+                    // Clonar la nueva categoría para cada usuario
+                    const clonedCategory = JSON.parse(JSON.stringify(newCategory));
+                    usersDB[userKey].data.categories.push(clonedCategory);
+                    // Si la nueva categoría es una de las principales, también inicializamos los datos de tendencias para ese usuario
+                    if (trendCategories.includes(clonedCategory.id)) {
+                        usersDB[userKey].data.trends.scores[clonedCategory.id] = Array(12).fill(0);
+                    }
+                }
+            });
+            saveUsersToLocalStorage();
+        }
+
+        // Lógica para actualizar una categoría en todos los usuarios
+        function updateCategory(updatedCategory) {
+            Object.keys(usersDB).forEach(userKey => {
+                if (usersDB[userKey].role === 'user') {
+                    const categories = usersDB[userKey].data.categories;
+                    const index = categories.findIndex(cat => cat.id === updatedCategory.id);
+                    if (index !== -1) {
+                        // Actualizar los campos que el administrador puede modificar
+                        categories[index].name = updatedCategory.name;
+                        categories[index].emoji = updatedCategory.emoji;
+                        categories[index].criteria = updatedCategory.criteria;
+                    }
+                }
+            });
+            saveUsersToLocalStorage();
+        }
+
+        // Lógica para eliminar una categoría de todos los usuarios
+        function deleteCategory(categoryId) {
+            Object.keys(usersDB).forEach(userKey => {
+                if (usersDB[userKey].role === 'user') {
+                    usersDB[userKey].data.categories = usersDB[userKey].data.categories.filter(cat => cat.id !== categoryId);
+                }
+            });
+            // Eliminar también de las tendencias si aplica
+            const trendCategories = ['retencion', 'reincorporacion', 'procesos', 'general'];
+            if (trendCategories.includes(categoryId)) {
+                Object.keys(usersDB).forEach(userKey => {
+                    if (usersDB[userKey].role === 'user') {
+                        delete usersDB[userKey].data.trends.scores[categoryId];
+                    }
+                });
+            }
+            saveUsersToLocalStorage();
+            showCategoryManagementModal();
+        }
+
+        // --- Fin de las nuevas funciones ---
 
         // Función para renderizar el dashboard principal
         function renderDashboard() {
